@@ -69,6 +69,7 @@ dependencies {
     implementation(libs.androidx.ui.tooling.preview)
     implementation(libs.androidx.material3)
     implementation(libs.androidx.lifecycle.viewmodel.ktx)
+    implementation(libs.androidx.espresso.core)
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.junit)
     androidTestImplementation(libs.androidx.espresso.core)
@@ -102,4 +103,8 @@ dependencies {
 
     //Serialization
     implementation(libs.kotlinx.serialization.json)
+
+
+    //extra icon
+    implementation(libs.androidx.material.icons.extended)
 }
