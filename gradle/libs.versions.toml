@@ -1,6 +1,6 @@
 [versions]
 agp = "8.8.2"
-kotlin = "2.1.0"
+kotlin = "2.1.10"
 coreKtx = "1.15.0"
 junit = "4.13.2"
 junitVersion = "1.2.1"
@@ -9,14 +9,15 @@ lifecycleRuntimeKtx = "2.8.7"
 activityCompose = "1.10.1"
 composeBom = "2025.02.00"
 kotlinxSerializationJson = "1.8.0"
-kspVersion = "2.0.20-1.0.25"
-hiltVersion = "2.49"
+kspVersion = "2.1.10-1.0.31"
+hiltVersion = "2.55"
 hiltCompiler = "1.2.0"
-hiltAndroidCompiler = "2.48.1"
+hiltAndroidCompiler = "2.55"
 lifecycleViewmodelCompose = "2.8.7"
 navigationCompose = "2.8.8"
 ktor-version = "3.1.1"
 supabase_version = "3.1.1"
+animationCoreLint = "1.8.0-beta03"
 
 [libraries]
 androidx-core-ktx = { group = "androidx.core", name = "core-ktx", version.ref = "coreKtx" }
@@ -45,6 +46,7 @@ androidx-navigation-compose = { group = "androidx.navigation",name = "navigation
 androidx-ktor-client = {group = "io.ktor" , name = "ktor-client-android" , version.ref = "ktor-version"}
 supa-base-bom = {group = "io.github.jan-tennert.supabase" , name = "bom" , version.ref = "supabase_version"}
 supa-base-postgrest = {group = "io.github.jan-tennert.supabase" , name = "postgrest-kt"}
+androidx-material-icons-extended = {  group = "androidx.compose.material", name = "material-icons-extended"}
 
 
 [plugins]
