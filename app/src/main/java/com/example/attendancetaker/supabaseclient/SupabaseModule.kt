@@ -1,6 +1,7 @@
 package com.example.attendancetaker.supabaseclient
 
 import com.example.attendancetaker.BuildConfig
+import com.example.attendancetaker.MySharedPreferenceDataStore
 import com.example.attendancetaker.domain.authentication.repository.IAuthentication
 import com.example.attendancetaker.repository.AuthenticationImpl
 import dagger.Module
@@ -48,8 +49,9 @@ object SupabaseModule {
     fun provideAuthenticationRepositoryImpl(
         auth: Auth
     ): IAuthentication {
-        return AuthenticationImpl(auth = auth)
+        return AuthenticationImpl(
+            auth = auth
+        )
     }
-
 
 }

@@ -1,4 +1,4 @@
-package com.example.attendancetaker.ui.authentication.signIn
+package com.example.attendancetaker.ui.authentication.signUp
 
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
@@ -18,6 +18,7 @@ import androidx.compose.material.icons.filled.Visibility
 import androidx.compose.material.icons.filled.VisibilityOff
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
+import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
@@ -27,6 +28,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.AnnotatedString
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
@@ -40,7 +42,7 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 @Composable
 fun SignInScreen(modifier: Modifier = Modifier) {
 
-    val viewModel: SignInViewModel = hiltViewModel()
+    val viewModel: SignUpViewModel = hiltViewModel()
 
     val uiState by viewModel.state.collectAsStateWithLifecycle()
 
@@ -66,7 +68,7 @@ fun SignInScreen(modifier: Modifier = Modifier) {
                 modifier = Modifier.fillMaxWidth(),
                 value = uiState.name,
                 onValueChange = {
-                    viewModel.onEvent(SignInEvent.OnNameChange(it))
+                    viewModel.onEvent(SignUpEvent.OnNameChange(it))
                 },
                 label = { Text("Full Name") },
                 leadingIcon = { Icon(Icons.Default.Person, contentDescription = "User Icon") }
@@ -76,7 +78,14 @@ fun SignInScreen(modifier: Modifier = Modifier) {
                 modifier = Modifier.fillMaxWidth(),
                 value = uiState.email,
                 onValueChange = {
-                    viewModel.onEvent(SignInEvent.OnEmailChange(it))
+                    viewModel.onEvent(SignUpEvent.OnEmailChange(it))
+                },
+                isError = uiState.isEmailError,
+                supportingText = {
+                    if (uiState.isEmailError)
+                        Text(
+                            text = "Email is wrong"
+                        )
                 },
                 label = { Text("Email Address") },
                 leadingIcon = { Icon(Icons.Default.Email, contentDescription = "Email Icon") }
@@ -86,14 +95,21 @@ fun SignInScreen(modifier: Modifier = Modifier) {
                 modifier = Modifier.fillMaxWidth(),
                 value = uiState.password,
                 onValueChange = {
-                    viewModel.onEvent(SignInEvent.OnPasswordChange(it))
+                    viewModel.onEvent(SignUpEvent.OnPasswordChange(it))
                 },
                 label = { Text("Password") },
+                isError = uiState.isPasswordError,
+                supportingText = {
+                    if (uiState.isPasswordError)
+                    Text(
+                        text = "Password is wrong"
+                    )
+                },
                 visualTransformation = if (uiState.passwordVisible) VisualTransformation.None else PasswordVisualTransformation(),
                 leadingIcon = { Icon(Icons.Default.Lock, contentDescription = "Password Icon") },
                 trailingIcon = {
                     IconButton(onClick = {
-                        viewModel.onEvent(SignInEvent.OnPasswordVisibleChange(uiState.passwordVisible))
+                        viewModel.onEvent(SignUpEvent.OnPasswordVisibleChange(uiState.passwordVisible))
                     }) {
                         Icon(
                             imageVector = if (uiState.passwordVisible) Icons.Default.Visibility else Icons.Default.VisibilityOff,
@@ -104,12 +120,19 @@ fun SignInScreen(modifier: Modifier = Modifier) {
             )
 
             Button(
-                onClick = {},
+                onClick = {
+                    viewModel.onEvent(SignUpEvent.OnSubmitButtonClick)
+                },
+                enabled = uiState.isButtonVisible ,
                 modifier = Modifier.fillMaxWidth(),
                 shape = RoundedCornerShape(8.dp),
                 colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.primary)
             ) {
-                Text(text = "Sign In", fontSize = 18.sp, fontWeight = FontWeight.Bold)
+                if(uiState.isLoading) CircularProgressIndicator(
+                    strokeWidth = 2.dp,
+                    color = Color.White,
+                )
+                else Text(text = "Sign In", fontSize = 18.sp, fontWeight = FontWeight.Bold)
             }
 
             Spacer(modifier = Modifier.height(16.dp))
