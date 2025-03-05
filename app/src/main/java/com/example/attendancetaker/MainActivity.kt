@@ -14,7 +14,9 @@ import androidx.compose.material3.SnackbarResult
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Modifier
-import com.example.attendancetaker.ui.authentication.signUp.SignInScreen
+import com.example.attendancetaker.ui.authentication.signIn.SignInScreen
+import com.example.attendancetaker.ui.authentication.signUp.SignUpScreen
+import com.example.attendancetaker.ui.teacher.TeacherScreen
 import com.example.attendancetaker.ui.theme.AttendanceTakerTheme
 import com.example.attendancetaker.utils.ObserverAsEvent
 import com.example.attendancetaker.utils.SnackBarController
@@ -58,7 +60,7 @@ class MainActivity : ComponentActivity() {
                     },
                     modifier = Modifier.fillMaxSize()
                 ) { innerPadding ->
-                    SignInScreen(modifier = Modifier.padding(innerPadding))
+                    TeacherScreen(modifier = Modifier.padding(innerPadding))
                 }
             }
         }

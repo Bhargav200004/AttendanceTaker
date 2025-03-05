@@ -8,4 +8,5 @@ interface IAuthentication {
     suspend fun isLoginUser(): Boolean
     suspend fun signOut(): Boolean
     suspend fun getAuthToken() : String?
+    suspend fun getTeacherDetails() : UserInfo?
 }

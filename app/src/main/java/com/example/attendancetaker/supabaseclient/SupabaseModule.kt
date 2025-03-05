@@ -3,7 +3,9 @@ package com.example.attendancetaker.supabaseclient
 import com.example.attendancetaker.BuildConfig
 import com.example.attendancetaker.MySharedPreferenceDataStore
 import com.example.attendancetaker.domain.authentication.repository.IAuthentication
+import com.example.attendancetaker.domain.teacher.repository.IClassRoom
 import com.example.attendancetaker.repository.AuthenticationImpl
+import com.example.attendancetaker.repository.ClassRoomImpl
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
@@ -47,10 +49,22 @@ object SupabaseModule {
     @Provides
     @Singleton
     fun provideAuthenticationRepositoryImpl(
-        auth: Auth
+        auth: Auth,
+        sharedPreferenceDataStore: MySharedPreferenceDataStore
     ): IAuthentication {
         return AuthenticationImpl(
-            auth = auth
+            auth = auth,
+            sharedPreferenceDataStore = sharedPreferenceDataStore
+        )
+    }
+
+    @Provides
+    @Singleton
+    fun provideClassRoomRepositoryImpl(
+        database : Postgrest,
+    ) : IClassRoom{
+        return ClassRoomImpl(
+            database =  database
         )
     }
 
