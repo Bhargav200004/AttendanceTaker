@@ -1,4 +1,4 @@
-package com.example.attendancetaker.ui.authentication.signUp
+package com.example.attendancetaker.ui.authentication.signIn
 
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
@@ -13,7 +13,6 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Email
 import androidx.compose.material.icons.filled.Lock
-import androidx.compose.material.icons.filled.Person
 import androidx.compose.material.icons.filled.Visibility
 import androidx.compose.material.icons.filled.VisibilityOff
 import androidx.compose.material3.Button
@@ -40,9 +39,9 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 
 @Composable
-fun SignUpScreen(modifier: Modifier = Modifier) {
+fun SignInScreen(modifier: Modifier = Modifier) {
 
-    val viewModel: SignUpViewModel = hiltViewModel()
+    val viewModel: SignInViewModel = hiltViewModel()
 
     val uiState by viewModel.state.collectAsStateWithLifecycle()
 
@@ -52,13 +51,13 @@ fun SignUpScreen(modifier: Modifier = Modifier) {
             .padding(horizontal = 24.dp, vertical = 32.dp),
         horizontalAlignment = Alignment.CenterHorizontally,
         verticalArrangement = Arrangement.Center
-    ) {
-        Text(
-            text = "Teacher Sign Up",
-            style = MaterialTheme.typography.headlineMedium,
-            fontWeight = FontWeight.Bold,
-            modifier = Modifier.padding(bottom = 24.dp)
-        )
+    ){
+      Text(
+          text = "Teacher Sign In",
+          style = MaterialTheme.typography.headlineMedium,
+          fontWeight = FontWeight.Bold,
+          modifier = Modifier.padding(bottom = 24.dp)
+      )
 
         Column(
             modifier = Modifier.fillMaxWidth(),
@@ -66,28 +65,18 @@ fun SignUpScreen(modifier: Modifier = Modifier) {
         ) {
             OutlinedTextField(
                 modifier = Modifier.fillMaxWidth(),
-                value = uiState.name,
-                onValueChange = {
-                    viewModel.onEvent(SignUpEvent.OnNameChange(it))
-                },
-                label = { Text("Full Name") },
-                leadingIcon = { Icon(Icons.Default.Person, contentDescription = "User Icon") }
-            )
-
-            OutlinedTextField(
-                modifier = Modifier.fillMaxWidth(),
                 value = uiState.email,
                 onValueChange = {
-                    viewModel.onEvent(SignUpEvent.OnEmailChange(it))
+                    viewModel.onEvent(SignInEvent.OnEmailChange(it))
                 },
                 isError = uiState.isEmailError,
                 supportingText = {
-                    if (uiState.isEmailError)
+                    if(uiState.isEmailError)
                         Text(
                             text = "Email is wrong"
                         )
                 },
-                label = { Text("Email Address") },
+                label = { Text(text = "Email Address") },
                 leadingIcon = { Icon(Icons.Default.Email, contentDescription = "Email Icon") }
             )
 
@@ -95,25 +84,25 @@ fun SignUpScreen(modifier: Modifier = Modifier) {
                 modifier = Modifier.fillMaxWidth(),
                 value = uiState.password,
                 onValueChange = {
-                    viewModel.onEvent(SignUpEvent.OnPasswordChange(it))
+                    viewModel.onEvent(SignInEvent.OnPasswordChange(it))
                 },
-                label = { Text("Password") },
                 isError = uiState.isPasswordError,
                 supportingText = {
-                    if (uiState.isPasswordError)
-                    Text(
-                        text = "Password is wrong"
-                    )
+                    if(uiState.isPasswordError)
+                        Text(
+                            text = "Password is wrong"
+                        )
                 },
+                label = { Text(text = "Password") },
                 visualTransformation = if (uiState.passwordVisible) VisualTransformation.None else PasswordVisualTransformation(),
-                leadingIcon = { Icon(Icons.Default.Lock, contentDescription = "Password Icon") },
+                leadingIcon = { Icon(Icons.Default.Lock , contentDescription = "Password Icon") },
                 trailingIcon = {
                     IconButton(onClick = {
-                        viewModel.onEvent(SignUpEvent.OnPasswordVisibleChange(uiState.passwordVisible))
+                        viewModel.onEvent(SignInEvent.OnPasswordVisibleChange(uiState.passwordVisible))
                     }) {
                         Icon(
-                            imageVector = if (uiState.passwordVisible) Icons.Default.Visibility else Icons.Default.VisibilityOff,
-                            contentDescription = if (uiState.passwordVisible) "Hide Password" else "Show Password"
+                            imageVector = if (uiState.isButtonVisible) Icons.Default.Visibility else Icons.Default.VisibilityOff,
+                            contentDescription = if (uiState.isButtonVisible) "Hide Password" else "Show Password"
                         )
                     }
                 }
@@ -121,42 +110,71 @@ fun SignUpScreen(modifier: Modifier = Modifier) {
 
             Button(
                 onClick = {
-                    viewModel.onEvent(SignUpEvent.OnSubmitButtonClick)
+                    viewModel.onEvent(SignInEvent.OnSubmitButtonClick)
                 },
-                enabled = uiState.isButtonVisible ,
+                enabled = uiState.isButtonVisible,
                 modifier = Modifier.fillMaxWidth(),
                 shape = RoundedCornerShape(8.dp),
                 colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.primary)
             ) {
-                if(uiState.isLoading) CircularProgressIndicator(
+                if ( uiState.isLoading ) CircularProgressIndicator(
                     strokeWidth = 2.dp,
-                    color = Color.White,
+                    color = Color.White
                 )
                 else Text(text = "Sign Up", fontSize = 18.sp, fontWeight = FontWeight.Bold)
             }
 
-            Spacer(modifier = Modifier.height(16.dp))
+            Spacer(modifier = Modifier.height(8.dp))
 
             Row(
                 modifier = Modifier.fillMaxWidth(),
-                verticalAlignment = Alignment.CenterVertically
+                verticalAlignment = Alignment.CenterVertically,
+                horizontalArrangement = Arrangement.SpaceBetween
             ) {
-                Text(
-                    text = "Already have an Account? "
-                )
-                Text(
-                    modifier =  Modifier.
-                        clickable {
 
-                        },
-                    text = AnnotatedString("Login"),
-                    style = TextStyle(
-                        color = MaterialTheme.colorScheme.primary,
-                        fontSize = 16.sp,
-                        fontWeight = FontWeight.Medium
-                    )
+                AnnotatedButtons(
+                    supportingText = "Not Have Account? ",
+                    clickableText = "Sign Up",
+                    onAnnotatedButtonClick = {}
                 )
+
+                AnnotatedButtons(
+                    supportingText = "Forget ",
+                    clickableText = "Password",
+                    onAnnotatedButtonClick = {}
+                )
+
             }
         }
+    }
+}
+
+@Composable
+fun AnnotatedButtons(
+    supportingText: String,
+    clickableText: String,
+    onAnnotatedButtonClick : () -> Unit
+) {
+    Row (
+        verticalAlignment = Alignment.CenterVertically
+    ){
+
+        Text(
+            text = supportingText,
+            fontSize = 14.sp
+        )
+
+        Text(
+            modifier = Modifier.
+            clickable {
+                onAnnotatedButtonClick()
+            },
+            text = AnnotatedString(clickableText),
+            style = TextStyle(
+                color = MaterialTheme.colorScheme.primary,
+                fontSize = 14.sp,
+                fontWeight = FontWeight.Medium
+            )
+        )
     }
 }
