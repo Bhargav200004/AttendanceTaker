@@ -7,5 +7,6 @@ data class SignInData (
     val isPasswordError : Boolean = false,
     val isEmailError : Boolean = false,
     val isButtonVisible : Boolean = false,
-    val isLoading : Boolean = false
+    val isLoading : Boolean = false,
+    val navigationApproval : Boolean = false
 )

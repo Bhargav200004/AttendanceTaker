@@ -4,6 +4,7 @@ import android.content.ContentValues.TAG
 import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.example.attendancetaker.MySharedPreferenceDataStore
 import com.example.attendancetaker.domain.teacher.model.Classroom
 import com.example.attendancetaker.repository.ClassRoomImpl
 import com.example.attendancetaker.utils.SnackBarController
@@ -20,7 +21,8 @@ import javax.inject.Inject
 
 @HiltViewModel
 class TeacherViewModel @Inject constructor(
-    private val classRoomImpl: ClassRoomImpl
+    private val classRoomImpl: ClassRoomImpl,
+    private val preferenceDataStore: MySharedPreferenceDataStore
 ) : ViewModel() {
 
 
@@ -61,9 +63,11 @@ class TeacherViewModel @Inject constructor(
                     classSection = state.value.selectedSection
                 )
 
-                classRoomImpl.createClassRoom(
-                    classroom = classroom
-                )
+                val teacherId = preferenceDataStore.getTeacherId()
+
+//                classRoomImpl.createClassRoom(
+//                    classroom = classroom
+//                )
 
                 SnackBarController.sendEvent(
                     event = SnackBarEvent(

@@ -1,12 +1,11 @@
 package com.example.attendancetaker.ui.authentication.signUp
 
 
-import android.content.ContentValues.TAG
-import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.attendancetaker.MySharedPreferenceDataStore
 import com.example.attendancetaker.repository.AuthenticationImpl
+import com.example.attendancetaker.utils.Result
 import com.example.attendancetaker.utils.SnackBarController
 import com.example.attendancetaker.utils.SnackBarEvent
 import com.example.attendancetaker.utils.functions.ValidationFunction.isValidEmail
@@ -18,13 +17,14 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
+import timber.log.Timber
 import javax.inject.Inject
 
 @HiltViewModel
 class SignUpViewModel @Inject constructor(
-    private val signUpAuth : AuthenticationImpl,
-    private val preferenceDataStore: MySharedPreferenceDataStore
-)  : ViewModel() {
+    private val signUpAuth: AuthenticationImpl,
+    private val preferenceDataStore: MySharedPreferenceDataStore,
+) : ViewModel() {
 
     private var _state = MutableStateFlow(SignUpData())
     val state = _state.asStateFlow().stateIn(
@@ -34,7 +34,7 @@ class SignUpViewModel @Inject constructor(
     )
 
     fun onEvent(event: SignUpEvent) {
-        when(event){
+        when (event) {
             is SignUpEvent.OnNameChange -> onNameChange(name = event.name)
             is SignUpEvent.OnEmailChange -> onEmailChange(email = event.email)
             is SignUpEvent.OnPasswordChange -> onPasswordChange(password = event.password)
@@ -43,9 +43,9 @@ class SignUpViewModel @Inject constructor(
         }
     }
 
-    private fun onNameChange (name: String) {
+    private fun onNameChange(name: String) {
         viewModelScope.launch {
-            _state.update {state ->
+            _state.update { state ->
                 state.copy(
                     name = name
                 )
@@ -53,23 +53,22 @@ class SignUpViewModel @Inject constructor(
         }
     }
 
-    private fun onEmailChange (email: String) {
+    private fun onEmailChange(email: String) {
         viewModelScope.launch {
-            _state.update {state ->
+            _state.update { state ->
                 state.copy(
                     email = email
                 )
             }
-            if (isValidEmail(email)){
+            if (isValidEmail(email)) {
                 _state.update { state ->
                     state.copy(
                         isEmailError = false,
                         isButtonVisible = true
                     )
                 }
-            }
-            else{
-                _state.update {state ->
+            } else {
+                _state.update { state ->
                     state.copy(
                         isEmailError = true,
                         isButtonVisible = false
@@ -79,23 +78,22 @@ class SignUpViewModel @Inject constructor(
         }
     }
 
-    private fun onPasswordChange (password: String) {
+    private fun onPasswordChange(password: String) {
         viewModelScope.launch {
             _state.update { state ->
                 state.copy(
                     password = password
                 )
             }
-            if(isValidPassword(password)){
-                _state.update {state ->
+            if (isValidPassword(password)) {
+                _state.update { state ->
                     state.copy(
                         isPasswordError = false,
                         isButtonVisible = true
                     )
                 }
-            }
-            else{
-                _state.update {state ->
+            } else {
+                _state.update { state ->
                     state.copy(
                         isPasswordError = true,
                         isButtonVisible = false
@@ -105,9 +103,9 @@ class SignUpViewModel @Inject constructor(
         }
     }
 
-    private fun onPasswordVisibilityChange (passwordVisible: Boolean){
+    private fun onPasswordVisibilityChange(passwordVisible: Boolean) {
         viewModelScope.launch {
-            _state.update {state ->
+            _state.update { state ->
                 state.copy(
                     passwordVisible = !passwordVisible
                 )
@@ -115,7 +113,7 @@ class SignUpViewModel @Inject constructor(
         }
     }
 
-    private fun onSubmitButtonClick () {
+    private fun onSubmitButtonClick() {
         viewModelScope.launch {
             try {
 
@@ -123,48 +121,80 @@ class SignUpViewModel @Inject constructor(
                 signUp()
 
             } catch (e: Exception) {
-                Log.e("sign in", "Error => ${e.message}")
+
+                _state.update { state ->
+                    state.copy(
+                        navigationApproval = false
+                    )
+                }
+                Timber.e("onSubmitButtonClick: ${e.message}")
+
             }
         }
     }
 
     private suspend fun signUp() {
         try {
-            _state.update {state ->
+
+            _state.update { state ->
                 state.copy(
                     isLoading = true
                 )
             }
-
             val result = signUpAuth.signUp(
                 email = state.value.email,
                 password = state.value.password
             )
 
-            if(!result) {
-                _state.update {state ->
-                    state.copy(
-                        isLoading = false
+            when (result) {
+
+                is Result.OnSuccess -> {
+                    SnackBarController.sendEvent(
+                        event = SnackBarEvent(
+                            message = result.data?.successMessage ?: ""
+                        )
+                    )
+                    preferenceDataStore.onSendTeacherName(teacherName = state.value.name)
+                    _state.update { state ->
+                        state.copy(
+                            isLoading = false,
+                            navigationApproval = true,
+                        )
+                    }
+
+                }
+
+                is Result.OnError -> {
+
+                    _state.update { state ->
+                        state.copy(
+                            isLoading = false,
+                            navigationApproval = false
+                        )
+                    }
+                    SnackBarController.sendEvent(
+                        event = SnackBarEvent(
+                            message = result.error?.errorMessage?.errorDescription ?: "Try Again"
+                        )
                     )
                 }
             }
+        } catch (e: Exception) {
 
-            preferenceDataStore.onSendTeacherName(teacherName = state.value.name)
-
-            _state.update {state ->
+            _state.update { state ->
                 state.copy(
+                    navigationApproval = false,
                     isLoading = false
                 )
             }
-
             SnackBarController.sendEvent(
                 event = SnackBarEvent(
-                    message = "Successfully Register To App"
+                    message = "No Internet Connection"
                 )
             )
-        }
-        catch (e : Exception){
-            Log.e(TAG , "error => ${e.message}")
+
+            Timber.d("signUpError: ${e.message}")
+
         }
     }
 }

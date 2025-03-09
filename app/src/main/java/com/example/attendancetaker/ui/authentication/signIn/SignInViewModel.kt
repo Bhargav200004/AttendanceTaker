@@ -5,7 +5,10 @@ import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.attendancetaker.MySharedPreferenceDataStore
+import com.example.attendancetaker.domain.teacher.model.Teacher
 import com.example.attendancetaker.repository.AuthenticationImpl
+import com.example.attendancetaker.repository.TeacherImpl
+import com.example.attendancetaker.utils.Result
 import com.example.attendancetaker.utils.SnackBarController
 import com.example.attendancetaker.utils.SnackBarEvent
 import com.example.attendancetaker.utils.functions.ValidationFunction.isValidEmail
@@ -17,12 +20,15 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
+import timber.log.Timber
+import java.util.UUID
 import javax.inject.Inject
 
 @HiltViewModel
 class SignInViewModel @Inject constructor(
     private val signInAuth : AuthenticationImpl,
-    private val preferenceDataStore : MySharedPreferenceDataStore
+    private val preferenceDataStore : MySharedPreferenceDataStore,
+    private val teacherDataBase: TeacherImpl
 ) : ViewModel() {
 
     private var _state = MutableStateFlow(SignInData())
@@ -107,17 +113,7 @@ class SignInViewModel @Inject constructor(
         viewModelScope.launch {
             try {
                 if (!state.value.isButtonVisible) return@launch
-                _state.update { state ->
-                    state.copy(
-                        isLoading = true
-                    )
-                }
                 signIn()
-                _state.update { state ->
-                    state.copy(
-                        isLoading = false
-                    )
-                }
             }
             catch (e : Exception){
                 Log.e(TAG,"error => ${e.message}")
@@ -125,48 +121,102 @@ class SignInViewModel @Inject constructor(
         }
     }
 
+
     private suspend fun signIn() {
         try {
+
+            _state.update { state ->
+                state.copy(
+                    isLoading = true
+                )
+            }
+
             val result = signInAuth.signIn(
                 email = state.value.email ,
                 password = state.value.password
                 )
 
-            if (!result){
-                _state.update {state ->
-                    state.copy(
-                        isLoading = false
+            when(result){
+                is Result.OnSuccess -> {
+                    val value = signInAuth.getAuthToken() ?: ""
+
+                    val teacherData = signInAuth.getTeacherDetails()
+
+                    if (teacherData != null){
+                        preferenceDataStore.onSendTokenUserId(
+                            userToken =  value  ,
+                            teacherId = teacherData.id
+                        )
+                        // checking does teacher already present or not
+                        val teacherAlreadyPresent = teacherDataBase.getTeacherById(id = UUID.fromString(teacherData.id))
+                        if ( teacherAlreadyPresent == null){
+                            saveTeacherDataInSupaBase(teacherId = UUID.fromString(teacherData.id));
+                        }
+                    }
+
+                    _state.update { state ->
+                        state.copy(
+                            isLoading = false,
+                            navigationApproval = true
+                        )
+                    }
+
+                    SnackBarController.sendEvent(
+                        event = SnackBarEvent(
+                            message = result.data?.successMessage ?: ""
+                        )
                     )
                 }
-                SnackBarController.sendEvent(
-                    event = SnackBarEvent(
-                        message = "Not Register ! \nRetry after some time"
+                is Result.OnError -> {
+                    _state.update { state ->
+                        state.copy(
+                            isLoading = false
+                        )
+                    }
+
+                    SnackBarController.sendEvent(
+                        event = SnackBarEvent(
+                            message = result.error?.errorMessage?.errorDescription ?: ""
+                        )
                     )
-                )
+                }
             }
 
-            val value = signInAuth.getAuthToken() ?: ""
-
-            val teacherData = signInAuth.getTeacherDetails() ?: return
-
-            preferenceDataStore.onSendTokenUserId(
-                userToken =  value  ,
-                teacherId = teacherData.id
-                )
-
-            SnackBarController.sendEvent(
-                event = SnackBarEvent(
-                    message = "Successfully Login Enjoy the app"
-                )
-            )
-
         }catch (e : Exception){
+
+            _state.update { state ->
+                state.copy(
+                    isLoading = false
+                )
+            }
             SnackBarController.sendEvent(
                 event = SnackBarEvent(
-                    message = e.message.toString()
+                    message = "Try Again Later"
                 )
             )
-            Log.e(TAG , "error => ${e.message}")
+
+            Timber.e("signIn: ${e.message}")
+
+        }
+    }
+
+    private suspend fun saveTeacherDataInSupaBase(teacherId : UUID) {
+        try {
+
+
+            // Get data from shared Preference
+            val teacherName = preferenceDataStore.getTeacherName()
+
+            // Creating new teacher Object
+            val teacher = Teacher(
+                teacherId = teacherId,
+                assignedClass = null,
+                teacherName = teacherName
+            )
+
+            teacherDataBase.createTeacher(teacher)
+        }catch (e : Exception){
+            Timber.e("saveTeacherDataInSupaBase: ${e.message}")
         }
     }
 }

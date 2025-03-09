@@ -24,6 +24,7 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -37,13 +38,23 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import androidx.navigation.NavController
+import androidx.navigation.NavHostController
+import com.example.attendancetaker.navigation.AuthScreen
+import com.example.attendancetaker.navigation.TeacherScreen
 
 @Composable
-fun SignInScreen(modifier: Modifier = Modifier) {
+fun SignInScreen(modifier: Modifier = Modifier , navController : NavController) {
 
     val viewModel: SignInViewModel = hiltViewModel()
 
     val uiState by viewModel.state.collectAsStateWithLifecycle()
+
+
+    LaunchedEffect(key1 = uiState.navigationApproval) {
+        if (uiState.navigationApproval) navController.navigate(TeacherScreen.Teacher)
+    }
+
 
     Column(
         modifier = modifier
@@ -135,7 +146,9 @@ fun SignInScreen(modifier: Modifier = Modifier) {
                 AnnotatedButtons(
                     supportingText = "Not Have Account? ",
                     clickableText = "Sign Up",
-                    onAnnotatedButtonClick = {}
+                    onAnnotatedButtonClick = {
+                        navController.navigate(route = AuthScreen.Signup)
+                    }
                 )
 
                 AnnotatedButtons(
@@ -148,6 +161,10 @@ fun SignInScreen(modifier: Modifier = Modifier) {
         }
     }
 }
+
+
+// Adding  Teacher data to the supabase with null value for class_id
+// and completing navigations
 
 @Composable
 fun AnnotatedButtons(
