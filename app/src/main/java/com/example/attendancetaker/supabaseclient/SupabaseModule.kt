@@ -49,12 +49,10 @@ object SupabaseModule {
     @Provides
     @Singleton
     fun provideAuthenticationRepositoryImpl(
-        auth: Auth,
-        sharedPreferenceDataStore: MySharedPreferenceDataStore
+        auth: Auth
     ): IAuthentication {
         return AuthenticationImpl(
-            auth = auth,
-            sharedPreferenceDataStore = sharedPreferenceDataStore
+            auth = auth
         )
     }
 

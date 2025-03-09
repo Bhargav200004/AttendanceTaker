@@ -2,72 +2,86 @@ package com.example.attendancetaker.repository
 
 import android.content.ContentValues.TAG
 import android.util.Log
-import com.example.attendancetaker.MySharedPreferenceDataStore
+import com.example.attendancetaker.domain.authentication.models.AuthData
 import com.example.attendancetaker.domain.authentication.repository.IAuthentication
+import com.example.attendancetaker.domain.teacher.model.TeacherAuthDetails
+import com.example.attendancetaker.utils.Result
 import io.github.jan.supabase.auth.Auth
+import io.github.jan.supabase.auth.exception.AuthRestException
 import io.github.jan.supabase.auth.providers.builtin.Email
 import io.github.jan.supabase.auth.user.UserInfo
 import javax.inject.Inject
 
 class AuthenticationImpl @Inject constructor(
     private val auth: Auth,
-    private val sharedPreferenceDataStore: MySharedPreferenceDataStore
 ): IAuthentication {
 
+
+    // Sign Up Function
+    override suspend fun signUp(email: String, password: String): Result<AuthData> {
+        return try
+        {
+            auth.signUpWith(Email){
+                this.email = email
+                this.password = password
+            }
+            Result.OnSuccess(
+                AuthData(
+                    successMessage = "Successfully Register"
+                )
+            )
+        }
+        catch (e : AuthRestException)
+        {
+            Result.OnError(
+                AuthData(
+                    errorMessage = e
+                )
+            )
+        }
+    }
+
     // Sign In Function
-    override suspend fun signIn(email: String, password: String) : Boolean {
+    override suspend fun signIn(email: String, password: String) : Result<AuthData> {
         return try
         {
             auth.signInWith(Email) {
                 this.email = email
                 this.password = password
             }
-            true
+            Result.OnSuccess(data = AuthData(
+                successMessage = "Successfully Login \nEnjoy App"
+            ))
         }
-        catch (e: Exception)
+        catch (e: AuthRestException)
         {
-            Log.e(TAG , "error => ${e.message}")
-            false
-        }
-    }
-
-    // Sign Up Function
-    override suspend fun signUp(email: String, password: String): Boolean {
-        return try
-        {
-              auth.signUpWith(Email){
-                this.email = email
-                this.password = password
-            }
-            true
-        }
-        catch (e : Exception)
-        {
-            Log.e(TAG , "error => ${e.message}")
-            false
+            Result.OnError(
+                error = AuthData(
+                    errorMessage = e
+                )
+            )
         }
     }
 
     // Is Login User Function
-    override suspend fun isLoginUser(): Boolean {
+    override suspend fun isLoginTeacher(): TeacherAuthDetails {
         return try {
             val token = getAuthToken()
-            if (token == null )  return false
+            if (token == null )  return TeacherAuthDetails(isLogin = false)
             else {
                 auth.refreshCurrentSession()
-                val newAuthToken = getAuthToken() ?: return false
+                val newAuthToken = getAuthToken() ?: return TeacherAuthDetails(isLogin = false)
                 val teacherDetails = auth.retrieveUser(newAuthToken)
-                sharedPreferenceDataStore.onSendTokenUserId(
+                return TeacherAuthDetails(
                     userToken = newAuthToken,
-                    teacherId = teacherDetails.id
+                    teacherId = teacherDetails.id,
+                    isLogin = true
                 )
-                return true
             }
-
         }
         catch (e : Exception){
             Log.e(TAG , "${e.message}")
-            false
+            return TeacherAuthDetails(isLogin = false)
         }
     }
 

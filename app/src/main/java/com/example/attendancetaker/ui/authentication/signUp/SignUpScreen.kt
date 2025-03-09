@@ -25,6 +25,7 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -38,13 +39,23 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import androidx.navigation.NavController
+import androidx.navigation.NavHostController
+import com.example.attendancetaker.navigation.AuthScreen
 
 @Composable
-fun SignUpScreen(modifier: Modifier = Modifier) {
+fun SignUpScreen(
+    modifier: Modifier = Modifier ,
+    navController: NavController
+) {
 
     val viewModel: SignUpViewModel = hiltViewModel()
 
     val uiState by viewModel.state.collectAsStateWithLifecycle()
+
+    LaunchedEffect(key1 = uiState.navigationApproval) {
+        if (uiState.navigationApproval) navController.navigate(AuthScreen.Signin)
+    }
 
     Column(
         modifier = modifier
@@ -147,7 +158,7 @@ fun SignUpScreen(modifier: Modifier = Modifier) {
                 Text(
                     modifier =  Modifier.
                         clickable {
-
+                            navController.navigate(route = AuthScreen.Signin)
                         },
                     text = AnnotatedString("Login"),
                     style = TextStyle(

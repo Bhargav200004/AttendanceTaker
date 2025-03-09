@@ -111,4 +111,12 @@ dependencies {
 
     //DataStore
     implementation(libs.androidx.datastore.preferences)
+
+
+    //Timber library for logging the error and files
+    implementation(libs.timber)
+
+
+    // Pretty logger
+    implementation(libs.logger)
 }
