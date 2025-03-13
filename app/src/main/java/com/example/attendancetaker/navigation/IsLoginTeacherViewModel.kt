@@ -13,6 +13,7 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
+import timber.log.Timber
 import javax.inject.Inject
 
 @HiltViewModel
@@ -35,20 +36,16 @@ class IsLoginTeacherViewModel @Inject constructor(
     private fun getAuthenticated(){
         viewModelScope.launch {
             try {
-                val isLoginTeacher = isLoginTeacher.isLoginTeacher()
-                if (isLoginTeacher.isLogin){
-                    sharedPreferenceDataStore.onSendTokenUserId(
-                    userToken = isLoginTeacher.userToken,
-                    teacherId = isLoginTeacher.teacherId
-                )
-                    _state.update {state -> true }
+                val token = sharedPreferenceDataStore.getUserToken()
+                if (token.isEmpty()){
+                    _state.update {state -> false }
                 }
                 else{
-                    _state.update {state -> false }
+                    _state.update {state -> true }
                 }
             }
             catch (e : Exception){
-                Log.d( TAG , "error => ${e.message}")
+                Timber.e("getAuthenticated: ${e.message}")
             }
         }
     }

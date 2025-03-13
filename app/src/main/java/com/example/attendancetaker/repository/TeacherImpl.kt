@@ -1,13 +1,11 @@
 package com.example.attendancetaker.repository
 
-import android.content.ContentValues.TAG
-import android.util.Log
+
 import com.example.attendancetaker.domain.teacher.dto.TeacherDto
 import com.example.attendancetaker.domain.teacher.model.Teacher
 import com.example.attendancetaker.domain.teacher.repository.ITeacher
 import io.github.jan.supabase.postgrest.Postgrest
 import io.github.jan.supabase.postgrest.exception.PostgrestRestException
-import kotlinx.coroutines.flow.Flow
 import timber.log.Timber
 import java.util.UUID
 import javax.inject.Inject
@@ -31,11 +29,20 @@ class TeacherImpl @Inject constructor(
 
 
 
-    override suspend fun updateTeacher(teacher: Teacher) {
+    override suspend fun updateTeacherAssignedClass(classRoomId: String, teacherId: String) {
         try {
-
+            database.from("teachers").update(
+                {
+                    set("assigned_class", classRoomId)
+                },
+                {
+                    filter {
+                        eq("teacher_id", teacherId)
+                    }
+                }
+            )
         } catch (e : Exception){
-            Log.e(TAG, "error =>${e.message}")
+            Timber.e("updateTeacherAssignedClass: $e")
         }
     }
 
@@ -45,7 +52,7 @@ class TeacherImpl @Inject constructor(
                 filter {
                     eq("teacher_id",id)
                 }
-            }.decodeSingle<TeacherDto>()
+            }.decodeSingleOrNull<TeacherDto>()
             return result
         } catch (e : PostgrestRestException){
             return null

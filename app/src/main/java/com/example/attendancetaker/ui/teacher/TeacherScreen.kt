@@ -46,12 +46,21 @@ fun TeacherScreen(modifier: Modifier = Modifier) {
         }
     )
 
+//    MainTeacherScreen()
+
     if (uiState.showDialog){
         DialogWithClassAndSectionInput(
             uiState = uiState,
             onEvent =  viewModel::onEvent
         )
     }
+}
+
+
+
+@Composable
+fun MainTeacherScreen() {
+    TODO("Not yet implemented")
 }
 
 @Composable

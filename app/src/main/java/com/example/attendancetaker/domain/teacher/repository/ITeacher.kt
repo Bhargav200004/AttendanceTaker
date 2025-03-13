@@ -8,7 +8,7 @@ interface ITeacher {
 
     suspend fun createTeacher(teacher: Teacher)
 
-    suspend fun updateTeacher(teacher: Teacher)
+    suspend fun updateTeacherAssignedClass(classRoomId: String, teacherId: String)
 
     suspend fun getTeacherById(id: UUID) : TeacherDto?
 
