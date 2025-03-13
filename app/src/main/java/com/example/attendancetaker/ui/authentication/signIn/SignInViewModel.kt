@@ -140,7 +140,10 @@ class SignInViewModel @Inject constructor(
                 is Result.OnSuccess -> {
                     val value = signInAuth.getAuthToken() ?: ""
 
-                    val teacherData = signInAuth.getTeacherDetails()
+                    Timber.d("signIn: $value")
+                    val teacherData = signInAuth.getTeacherDetails(value)
+
+                    Timber.d("signIn: $teacherData")
 
                     if (teacherData != null){
                         preferenceDataStore.onSendTokenUserId(

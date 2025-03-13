@@ -10,6 +10,7 @@ import io.github.jan.supabase.auth.Auth
 import io.github.jan.supabase.auth.exception.AuthRestException
 import io.github.jan.supabase.auth.providers.builtin.Email
 import io.github.jan.supabase.auth.user.UserInfo
+import timber.log.Timber
 import javax.inject.Inject
 
 class AuthenticationImpl @Inject constructor(
@@ -63,28 +64,6 @@ class AuthenticationImpl @Inject constructor(
         }
     }
 
-    // Is Login User Function
-    override suspend fun isLoginTeacher(): TeacherAuthDetails {
-        return try {
-            val token = getAuthToken()
-            if (token == null )  return TeacherAuthDetails(isLogin = false)
-            else {
-                auth.refreshCurrentSession()
-                val newAuthToken = getAuthToken() ?: return TeacherAuthDetails(isLogin = false)
-                val teacherDetails = auth.retrieveUser(newAuthToken)
-                return TeacherAuthDetails(
-                    userToken = newAuthToken,
-                    teacherId = teacherDetails.id,
-                    isLogin = true
-                )
-            }
-        }
-        catch (e : Exception){
-            Log.e(TAG , "${e.message}")
-            return TeacherAuthDetails(isLogin = false)
-        }
-    }
-
     // Sign Out Function
     override suspend fun signOut(): Boolean {
         return try
@@ -101,23 +80,23 @@ class AuthenticationImpl @Inject constructor(
     // Getting Auth Token
     override suspend fun getAuthToken() : String? {
         return try {
-            auth.currentAccessTokenOrNull()
+            val currentSession = auth.currentAccessTokenOrNull()
+            return currentSession;
         }
         catch (e : Exception){
-            Log.e(TAG , "error => ${e.message}")
+            Timber.e("getAuthToken: ${e.message}")
             null
         }
     }
 
     // Getting Teacher Details
-    override suspend fun getTeacherDetails(): UserInfo? {
+    override suspend fun getTeacherDetails(authToken : String): UserInfo? {
         return try {
-            val authToken = getAuthToken() ?: return null
+//            val authToken = getAuthToken() ?: return null
             auth.retrieveUser(authToken)
         }catch (e : Exception){
-            Log.e(TAG , "error => ${e.message}")
+            Timber.e("getTeacherDetails: ${e.message}")
             null
         }
     }
-
 }

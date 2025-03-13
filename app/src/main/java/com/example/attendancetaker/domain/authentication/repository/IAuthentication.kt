@@ -8,8 +8,7 @@ import com.example.attendancetaker.utils.Result
 interface IAuthentication {
     suspend fun signUp(email: String, password: String): Result<AuthData>
     suspend fun signIn (email: String, password: String): Result<AuthData>
-    suspend fun isLoginTeacher(): TeacherAuthDetails
     suspend fun signOut(): Boolean
     suspend fun getAuthToken() : String?
-    suspend fun getTeacherDetails() : UserInfo?
+    suspend fun getTeacherDetails(authToken : String) : UserInfo?
 }

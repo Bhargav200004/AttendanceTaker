@@ -1,12 +1,11 @@
 package com.example.attendancetaker.ui.teacher
 
-import android.content.ContentValues.TAG
-import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.attendancetaker.MySharedPreferenceDataStore
 import com.example.attendancetaker.domain.teacher.model.Classroom
 import com.example.attendancetaker.repository.ClassRoomImpl
+import com.example.attendancetaker.repository.TeacherImpl
 import com.example.attendancetaker.utils.SnackBarController
 import com.example.attendancetaker.utils.SnackBarEvent
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -16,12 +15,14 @@ import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
+import timber.log.Timber
 import java.util.UUID
 import javax.inject.Inject
 
 @HiltViewModel
 class TeacherViewModel @Inject constructor(
     private val classRoomImpl: ClassRoomImpl,
+    private val teacherImpl : TeacherImpl,
     private val preferenceDataStore: MySharedPreferenceDataStore
 ) : ViewModel() {
 
@@ -63,11 +64,13 @@ class TeacherViewModel @Inject constructor(
                     classSection = state.value.selectedSection
                 )
 
+                classRoomImpl.createClassRoom(
+                    classroom = classroom
+                )
+
                 val teacherId = preferenceDataStore.getTeacherId()
 
-//                classRoomImpl.createClassRoom(
-//                    classroom = classroom
-//                )
+                teacherImpl.updateTeacherAssignedClass(classroom.classId.toString() , teacherId )
 
                 SnackBarController.sendEvent(
                     event = SnackBarEvent(
@@ -76,7 +79,7 @@ class TeacherViewModel @Inject constructor(
                 )
             }
             catch (e : Exception){
-                Log.e(TAG , "error => ${e.message}")
+                Timber.e("onSubmitChange: ${e.message}")
             }
         }
     }

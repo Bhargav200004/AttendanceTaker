@@ -1,7 +1,6 @@
-package com.example.attendancetaker.supabaseclient
+package com.example.attendancetaker.client
 
 import com.example.attendancetaker.BuildConfig
-import com.example.attendancetaker.MySharedPreferenceDataStore
 import com.example.attendancetaker.domain.authentication.repository.IAuthentication
 import com.example.attendancetaker.domain.teacher.repository.IClassRoom
 import com.example.attendancetaker.repository.AuthenticationImpl
