@@ -4,6 +4,6 @@ import java.util.UUID
 
 data class Classroom(
     val classId : UUID,
-    val className : String,
+    val className : Int,
     val classSection : String
 )

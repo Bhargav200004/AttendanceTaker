@@ -3,8 +3,10 @@ package com.example.attendancetaker.client
 import com.example.attendancetaker.BuildConfig
 import com.example.attendancetaker.domain.authentication.repository.IAuthentication
 import com.example.attendancetaker.domain.teacher.repository.IClassRoom
+import com.example.attendancetaker.domain.teacher.repository.IStudent
 import com.example.attendancetaker.repository.AuthenticationImpl
 import com.example.attendancetaker.repository.ClassRoomImpl
+import com.example.attendancetaker.repository.StudentImpl
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
@@ -62,6 +64,16 @@ object SupabaseModule {
     ) : IClassRoom{
         return ClassRoomImpl(
             database =  database
+        )
+    }
+
+    @Provides
+    @Singleton
+    fun provideStudentRepositoryImpl(
+        database : Postgrest
+    ) : IStudent {
+        return StudentImpl(
+            database = database
         )
     }
 

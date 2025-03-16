@@ -22,6 +22,7 @@ data class PreferenceData(
     val userToken: String,
     val teacherId: String,
     val teacherName: String,
+    val teacherEmail : String
 )
 
 @Singleton
@@ -35,6 +36,7 @@ class MySharedPreferenceDataStore @Inject constructor(
         val USER_TOKEN = stringPreferencesKey("user_token")
         val TEACHER_ID = stringPreferencesKey("teacher_id")
         val TEACHER_NAME = stringPreferencesKey("teacher_name")
+        val TEACHER_EMAIL = stringPreferencesKey("teacher_email")
     }
 
     private val preferenceDataFlow = myPreferenceDataStore.data
@@ -50,14 +52,23 @@ class MySharedPreferenceDataStore @Inject constructor(
             val userToken : String = preference[PreferenceKeys.USER_TOKEN] ?: ""
             val teacherId = preference[PreferenceKeys.TEACHER_ID] ?: ""
             val teacherName : String = preference[PreferenceKeys.TEACHER_NAME] ?: ""
+            val teacherEmail : String = preference[PreferenceKeys.TEACHER_EMAIL] ?: ""
 
             PreferenceData(
                 userToken = userToken,
                 teacherId = teacherId,
-                teacherName = teacherName
+                teacherName = teacherName,
+                teacherEmail = teacherEmail
             )
 
         }
+
+
+    suspend fun onSendTeacherEmail(teacherEmail : String){
+        myPreferenceDataStore.edit {mutablePreference ->
+            mutablePreference[PreferenceKeys.TEACHER_EMAIL] = teacherEmail
+        }
+    }
 
     suspend fun onSendTokenUserId(userToken : String , teacherId : String){
         myPreferenceDataStore.edit {mutablePreference ->
@@ -70,6 +81,13 @@ class MySharedPreferenceDataStore @Inject constructor(
         myPreferenceDataStore.edit {mutablePreference ->
         mutablePreference[PreferenceKeys.TEACHER_NAME] = teacherName
         }
+    }
+
+
+    suspend fun getTeacherEmail() : String {
+        return preferenceDataFlow.map {
+            it.teacherEmail
+        }.first()
     }
 
 

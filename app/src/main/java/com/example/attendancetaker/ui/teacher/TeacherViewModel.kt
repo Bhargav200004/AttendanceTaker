@@ -4,7 +4,9 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.attendancetaker.MySharedPreferenceDataStore
 import com.example.attendancetaker.domain.teacher.model.Classroom
+import com.example.attendancetaker.domain.teacher.model.Student
 import com.example.attendancetaker.repository.ClassRoomImpl
+import com.example.attendancetaker.repository.StudentImpl
 import com.example.attendancetaker.repository.TeacherImpl
 import com.example.attendancetaker.utils.SnackBarController
 import com.example.attendancetaker.utils.SnackBarEvent
@@ -23,6 +25,7 @@ import javax.inject.Inject
 class TeacherViewModel @Inject constructor(
     private val classRoomImpl: ClassRoomImpl,
     private val teacherImpl : TeacherImpl,
+    private val studentImpl : StudentImpl,
     private val preferenceDataStore: MySharedPreferenceDataStore
 ) : ViewModel() {
 
@@ -35,12 +38,82 @@ class TeacherViewModel @Inject constructor(
             initialValue = TeacherData()
         )
 
+    init {
+//        getInitialTeacherData()
+    }
+
+    private fun getInitialTeacherData() {
+        viewModelScope.launch {
+            try {
+                _state.update {state ->
+                    state.copy(
+                        isLoading = true
+                    )
+                }
+                val teacherId = preferenceDataStore.getTeacherId()
+                val teacherEmail = preferenceDataStore.getTeacherEmail()
+                if (teacherId.isEmpty()) return@launch
+                if (teacherEmail.isEmpty()) return@launch
+
+                val teacherDetail = teacherImpl.getTeacherById(UUID.fromString(teacherId))
+                if (teacherDetail?.assignedClass == null) {
+                    return@launch
+                }
+                val classRoomDetail = classRoomImpl.getClassRoom(teacherDetail.assignedClass)
+                
+                Timber.d("getInitialTeacherData: $classRoomDetail")
+
+                _state.update {state ->
+                    state.copy(
+                        teacherName = teacherDetail.teacherName,
+                        teacherEmail = teacherEmail,
+                        classRoom = classRoomDetail?.className.toString() + " " + classRoomDetail?.classSection,
+                        isClassRoomEmpty = false
+                    )
+                }
+                Timber.d("getInitialTeacherData: ${state.value} + $classRoomDetail")
+                _state.update {state ->
+                    state.copy(
+                        isLoading = false
+                    )
+                }
+            } catch (e: Exception) {
+                Timber.e("getInitialTeacherData: ${e.message}")
+            }
+        }
+    }
+
     fun onEvent(event : TeacherEvent){
         when(event){
             is TeacherEvent.OnClassRoomChange -> onClassRoomChange(classRoom = event.classroom)
             is TeacherEvent.OnSectionChange -> onSectionChange(section = event.section)
-            is TeacherEvent.OnShowDialogChange -> onShowDialogChange(show = event.show)
-            TeacherEvent.OnSubmitChange -> onSubmitChange()
+            is TeacherEvent.OnShowClassRoomDialogChange -> onShowClassRoomDialogChange(show = event.show)
+            is TeacherEvent.OnShowStudentDialogChange -> onShowStudentDialogChange(show = event.show)
+            is TeacherEvent.OnStudentNameChange -> onStudentNameChange(studentName = event.studentName)
+            is TeacherEvent.OnStudentRollNumberChange -> onStudentRollNumberChange(studentRollNumber = event.studentRollNumber)
+            TeacherEvent.OnClassRoomSubmitChange -> onClassRoomSubmitChange()
+            TeacherEvent.OnStudentSubmitChange -> onStudentSubmitChange()
+        }
+    }
+
+
+    private fun onStudentNameChange(studentName: String) {
+        viewModelScope.launch {
+            _state.update{state ->
+                state.copy(
+                    studentName = studentName
+                )
+            }
+        }
+    }
+
+    private fun onStudentRollNumberChange(studentRollNumber: String) {
+        viewModelScope.launch {
+            _state.update {state ->
+                state.copy(
+                    studentRollNumber = studentRollNumber
+                )
+            }
         }
     }
 
@@ -54,13 +127,43 @@ class TeacherViewModel @Inject constructor(
         }
     }
 
-    private fun onSubmitChange() {
+    private fun onShowClassRoomDialogChange(show: Boolean) {
+        viewModelScope.launch {
+            _state.update {state ->
+                state.copy(
+                    showClassRoomDialog = !show
+                )
+            }
+        }
+    }
+
+    private fun onShowStudentDialogChange(show: Boolean) {
+        viewModelScope.launch {
+            _state.update {state ->
+                state.copy(
+                    showStudentDialog = !show
+                )
+            }
+        }
+    }
+
+    private fun onClassRoomChange(classRoom: String) {
+        viewModelScope.launch {
+            _state.update {state ->
+                state.copy(
+                    classRoom = classRoom
+                )
+            }
+        }
+    }
+
+    private fun onClassRoomSubmitChange() {
         viewModelScope.launch {
             try {
 
                 val classroom = Classroom(
                     classId = UUID.randomUUID(),
-                    className = state.value.classRoom,
+                    className = state.value.classRoom.toInt(),
                     classSection = state.value.selectedSection
                 )
 
@@ -84,22 +187,33 @@ class TeacherViewModel @Inject constructor(
         }
     }
 
-    private fun onShowDialogChange(show: Boolean) {
+    private fun onStudentSubmitChange() {
         viewModelScope.launch {
-            _state.update {state ->
-                state.copy(
-                    showDialog = !show
-                )
-            }
-        }
-    }
+            try {
 
-    private fun onClassRoomChange(classRoom: String) {
-        viewModelScope.launch {
-            _state.update {state ->
-                state.copy(
-                    classRoom = classRoom
+                val student = Student(
+                    studentId = UUID.randomUUID(),
+                    studentName = state.value.studentName,
+                    studentRollNumber = state.value.studentRollNumber,
+                    classAssigned = state.value.assignedClassId
                 )
+
+                studentImpl.createStudent(student)
+
+                _state.update {state ->
+                    state.copy(
+                        studentName = "",
+                        studentRollNumber = ""
+                    )
+                }
+
+                SnackBarController.sendEvent(
+                    event = SnackBarEvent(
+                        message = "Successfully Student Added"
+                    )
+                )
+            }catch (e : Exception){
+                Timber.e("onStudentSubmitChange: ${e.message}")
             }
         }
     }

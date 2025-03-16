@@ -119,4 +119,8 @@ dependencies {
 
     // Pretty logger
     implementation(libs.logger)
+
+
+    // Google Fonts
+    implementation("androidx.compose.ui:ui-text-google-fonts:1.7.8")
 }

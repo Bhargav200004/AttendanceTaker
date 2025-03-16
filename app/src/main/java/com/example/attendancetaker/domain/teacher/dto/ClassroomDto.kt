@@ -13,7 +13,7 @@ data class ClassroomDto (
     val classId : UUID,
 
     @SerialName("class_name")
-    val className : String,
+    val className : Int,
 
     @SerialName("class_section")
     val classSection : String
