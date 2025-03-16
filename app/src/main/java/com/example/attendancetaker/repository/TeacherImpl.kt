@@ -27,8 +27,6 @@ class TeacherImpl @Inject constructor(
         }
     }
 
-
-
     override suspend fun updateTeacherAssignedClass(classRoomId: String, teacherId: String) {
         try {
             database.from("teachers").update(
@@ -59,6 +57,5 @@ class TeacherImpl @Inject constructor(
             Timber.e("getTeacherById: ${e.description}")
         }
     }
-
 
 }

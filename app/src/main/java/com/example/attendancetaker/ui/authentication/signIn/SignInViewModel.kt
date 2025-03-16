@@ -116,11 +116,10 @@ class SignInViewModel @Inject constructor(
                 signIn()
             }
             catch (e : Exception){
-                Log.e(TAG,"error => ${e.message}")
+                Timber.e("onSubmitButtonClick: ${e.message}")
             }
         }
     }
-
 
     private suspend fun signIn() {
         try {
@@ -140,15 +139,16 @@ class SignInViewModel @Inject constructor(
                 is Result.OnSuccess -> {
                     val value = signInAuth.getAuthToken() ?: ""
 
-                    Timber.d("signIn: $value")
                     val teacherData = signInAuth.getTeacherDetails(value)
-
-                    Timber.d("signIn: $teacherData")
 
                     if (teacherData != null){
                         preferenceDataStore.onSendTokenUserId(
                             userToken =  value  ,
                             teacherId = teacherData.id
+                        )
+
+                        preferenceDataStore.onSendTeacherEmail(
+                            teacherEmail = state.value.email
                         )
                         // checking does teacher already present or not
                         val teacherAlreadyPresent = teacherDataBase.getTeacherById(id = UUID.fromString(teacherData.id))
