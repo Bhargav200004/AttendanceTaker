@@ -11,6 +11,7 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material3.Card
@@ -26,7 +27,6 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.rememberDrawerState
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
@@ -36,6 +36,8 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Dialog
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import androidx.navigation.NavController
+import com.example.attendancetaker.navigation.AttendanceScreen
 import com.example.attendancetaker.ui.teacher.components.AttendanceGrid
 import com.example.attendancetaker.ui.teacher.components.CreateClassScreen
 import com.example.attendancetaker.ui.teacher.components.DialogWithClassAndSectionInput
@@ -43,17 +45,21 @@ import com.example.attendancetaker.ui.teacher.components.MainTeacherScreenTopBar
 import kotlinx.coroutines.launch
 
 @Composable
-fun TeacherScreen(modifier: Modifier = Modifier) {
+fun TeacherScreen(modifier : Modifier = Modifier, navController : NavController , classIdPassing : (String) -> Unit) {
 
     val viewModel: TeacherViewModel = hiltViewModel()
 
     val uiState by viewModel.state.collectAsStateWithLifecycle()
 
+
     MainTeacherScreen(
         uiState = uiState,
-        onEvent = viewModel::onEvent
+        onEvent = viewModel::onEvent,
+        onAttendanceButtonClick = {
+            classIdPassing(uiState.assignedClassId.toString())
+            navController.navigate(route = AttendanceScreen.Attendance)
+        }
     )
-
 
 //    if (uiState.isLoading){
 //        Box(
@@ -74,7 +80,11 @@ fun TeacherScreen(modifier: Modifier = Modifier) {
 //        }else {
 //            MainTeacherScreen(
 //                uiState = uiState,
-//                onEvent = viewModel::onEvent
+//                onEvent = viewModel::onEvent,
+//                onAttendanceButtonClick = {
+//                    classIdPassing(uiState.assignedClassId.toString())
+//                    navController.navigate(route = AttendanceScreen.Attendance)
+//                }
 //            )
 //        }
 //    }
@@ -98,6 +108,7 @@ fun TeacherScreen(modifier: Modifier = Modifier) {
 fun MainTeacherScreen(
     uiState: TeacherData,
     onEvent: (TeacherEvent) -> Unit,
+    onAttendanceButtonClick : () -> Unit
 ) {
     val drawerState = rememberDrawerState(initialValue = DrawerValue.Closed)
     val scope = rememberCoroutineScope()
@@ -108,6 +119,7 @@ fun MainTeacherScreen(
                 SidePanelContent(
                     teacherName = uiState.teacherName,
                     teacherEmail = uiState.teacherEmail,
+                    onAttendanceButtonClick = onAttendanceButtonClick,
                     onAddStudentButtonClick = {
                         onEvent(TeacherEvent.OnShowStudentDialogChange(uiState.showStudentDialog))
                         scope.launch {
@@ -136,39 +148,12 @@ fun MainTeacherScreen(
                     .padding(8.dp),
                 verticalArrangement = Arrangement.spacedBy(10.dp)
             ) {
-                items(0) {
-                    OutlinedCard(
-                        modifier = Modifier
-                            .fillMaxWidth(),
-                    ) {
-                        Column(
-                            modifier = Modifier
-                                .fillMaxWidth()
-                                .padding(16.dp),
-                            verticalArrangement = Arrangement.spacedBy(10.dp)
-                        ) {
-                            Text(
-                                text = "GUJJLA BHARGAV",
-                                style = MaterialTheme.typography.headlineLarge
-                            )
-                            Row(
-                                modifier = Modifier
-                                    .fillMaxWidth(),
-                                horizontalArrangement = Arrangement.SpaceBetween
-                            ) {
-                                Text(
-                                    text = "33200122003",
-                                    style = MaterialTheme.typography.headlineSmall
-                                )
-                                Text(
-                                    text = "10 'B'",
-                                    style = MaterialTheme.typography.headlineSmall
-                                )
-                            }
-
-                            AttendanceGrid()
-                        }
-                    }
+                items(uiState.studentData) {studentData ->
+                    AttendanceCard(
+                        name = studentData.studentName,
+                        rollNumber = studentData.studentRollNumber,
+                        classRoom = studentData.classRoom
+                    )
                 }
 
             }
@@ -176,10 +161,53 @@ fun MainTeacherScreen(
     }
 }
 
+
+@Composable
+fun AttendanceCard(
+    name : String,
+    rollNumber : Int,
+    classRoom : String,
+) {
+    OutlinedCard(
+        modifier = Modifier
+            .fillMaxWidth(),
+    ) {
+        Column(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(16.dp),
+            verticalArrangement = Arrangement.spacedBy(10.dp)
+        ) {
+            Text(
+                text = name,
+                style = MaterialTheme.typography.headlineLarge
+            )
+            Row(
+                modifier = Modifier
+                    .fillMaxWidth(),
+                horizontalArrangement = Arrangement.SpaceBetween
+            ) {
+                Text(
+                    text = rollNumber.toString(),
+                    style = MaterialTheme.typography.headlineSmall
+                )
+                Text(
+                    text = classRoom,
+                    style = MaterialTheme.typography.headlineSmall
+                )
+            }
+
+            AttendanceGrid()
+        }
+    }
+}
+
+
 @Composable
 fun SidePanelContent(
     teacherName: String,
     teacherEmail: String,
+    onAttendanceButtonClick: ()  -> Unit,
     onAddStudentButtonClick: () -> Unit,
 ) {
     Column(
@@ -194,6 +222,12 @@ fun SidePanelContent(
         Text(
             text = teacherEmail
         )
+        OutlinedButton(
+            shape = RoundedCornerShape(10.dp),
+            onClick = onAttendanceButtonClick
+        ) {
+            Text(text = "Add Attendance")
+        }
         OutlinedButton(
             shape = RoundedCornerShape(10.dp),
             onClick = onAddStudentButtonClick

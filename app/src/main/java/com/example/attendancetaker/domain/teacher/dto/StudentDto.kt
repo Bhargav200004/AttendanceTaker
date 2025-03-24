@@ -16,7 +16,7 @@ data class StudentDto(
     val studentName : String,
 
     @SerialName("student_rollnumber")
-    val studentRollNumber : String,
+    val studentRollNumber : Int,
 
     @SerialName("class_assigned")
     @Serializable(with = UUIDSerializer::class)

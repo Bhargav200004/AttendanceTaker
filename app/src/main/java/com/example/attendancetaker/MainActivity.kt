@@ -15,6 +15,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Modifier
 import com.example.attendancetaker.navigation.AppNavigation
+import com.example.attendancetaker.ui.attendance.AttendanceScreen
 import com.example.attendancetaker.ui.theme.AttendanceTakerTheme
 import com.example.attendancetaker.utils.ObserverAsEvent
 import com.example.attendancetaker.utils.SnackBarController
