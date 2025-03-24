@@ -1,9 +1,17 @@
+import java.util.Properties
+
 plugins {
     alias(libs.plugins.android.application)
     alias(libs.plugins.kotlin.android)
     alias(libs.plugins.kotlin.compose)
     alias(libs.plugins.kotlin.serialization)
+    alias(libs.plugins.ksp)
+    alias(libs.plugins.hilt.android)
 }
+
+//Reading value from local.property
+private val property =  Properties()
+property.load(project.rootProject.file("local.properties").inputStream())
 
 android {
     namespace = "com.example.attendancetaker"
@@ -26,6 +34,15 @@ android {
                 getDefaultProguardFile("proguard-android-optimize.txt"),
                 "proguard-rules.pro"
             )
+            buildConfigField("String", "SUPABASE_ANON_KEY" , "\"${property.getProperty("SUPABASE_ANON_KEY")}\"")
+            buildConfigField("String", "SECRET" , "\"${property.getProperty("SECRET")}\"")
+            buildConfigField("String" , "SUPABASE_URL", "\"${property.getProperty("SUPABASE_URL")}\"")
+        }
+
+        debug {
+            buildConfigField("String", "SUPABASE_ANON_KEY" , "\"${property.getProperty("SUPABASE_ANON_KEY")}\"")
+            buildConfigField("String", "SECRET" , "\"${property.getProperty("SECRET")}\"")
+            buildConfigField("String" , "SUPABASE_URL", "\"${property.getProperty("SUPABASE_URL")}\"")
         }
     }
     compileOptions {
@@ -37,6 +54,7 @@ android {
     }
     buildFeatures {
         compose = true
+        buildConfig = true
     }
 }
 
@@ -51,6 +69,7 @@ dependencies {
     implementation(libs.androidx.ui.tooling.preview)
     implementation(libs.androidx.material3)
     implementation(libs.androidx.lifecycle.viewmodel.ktx)
+    implementation(libs.androidx.espresso.core)
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.junit)
     androidTestImplementation(libs.androidx.espresso.core)
@@ -59,14 +78,49 @@ dependencies {
     debugImplementation(libs.androidx.ui.tooling)
     debugImplementation(libs.androidx.ui.test.manifest)
 
+
+    // compose
+    implementation(libs.androidx.lifecycle.viewmodel.compose)
+    implementation(libs.androidx.lifecycle.runtime.compose)
+    implementation(libs.androidx.navigation.compose)
+
+
     // SupaBase Dependency
-    implementation(libs.supa.base.bom)
-    implementation(libs.supa.base.postgrest.kt)
-    implementation(libs.supa.base.auth.kt)
+    implementation(platform(libs.supa.base.bom))
+    implementation(libs.supa.base.postgrest)
+
 
     //ktor-client
-    implementation(libs.ktor.client.engine.z)
+    implementation(libs.androidx.ktor.client)
+
+
+    // Hilt Dependency
+    implementation(libs.hilt.android)
+    ksp(libs.hilt.android.compiler)
+    ksp(libs.androidx.hilt.compiler)
+    implementation(libs.androidx.hilt.navigation.compose)
+
 
     //Serialization
     implementation(libs.kotlinx.serialization.json)
+
+
+    //extra icon
+    implementation(libs.androidx.material.icons.extended)
+
+
+    //DataStore
+    implementation(libs.androidx.datastore.preferences)
+
+
+    //Timber library for logging the error and files
+    implementation(libs.timber)
+
+
+    // Pretty logger
+    implementation(libs.logger)
+
+
+    // Google Fonts
+    implementation("androidx.compose.ui:ui-text-google-fonts:1.7.8")
 }
