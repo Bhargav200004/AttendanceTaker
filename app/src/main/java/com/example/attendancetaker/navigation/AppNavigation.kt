@@ -8,6 +8,8 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
+import com.example.attendancetaker.navigation.AttendanceScreen
+import com.example.attendancetaker.ui.attendance.AttendanceScreen
 import com.example.attendancetaker.ui.authentication.signIn.SignInScreen
 import com.example.attendancetaker.ui.authentication.signUp.SignUpScreen
 import com.example.attendancetaker.ui.teacher.TeacherScreen
@@ -29,7 +31,13 @@ fun AppNavigation(modifier: Modifier ) {
                 SignInScreen(navController = navHostController)
         }
         composable<TeacherScreen.Teacher> {
-            TeacherScreen()
+            TeacherScreen(navController = navHostController){assignedClassId ->
+                navHostController.currentBackStackEntry?.savedStateHandle?.set("assignedClassId",assignedClassId)
+            }
+        }
+        composable<AttendanceScreen.Attendance> {
+            val assignedClassId = navHostController.previousBackStackEntry?.savedStateHandle?.get<String>("assignedClassId")
+            AttendanceScreen(navController = navHostController , assignedClassId = assignedClassId.toString())
         }
     }
 }

@@ -5,6 +5,6 @@ import java.util.UUID
 data class Student(
     val studentId : UUID,
     val studentName : String,
-    val studentRollNumber : String,
+    val studentRollNumber : Int,
     val classAssigned : UUID
 )

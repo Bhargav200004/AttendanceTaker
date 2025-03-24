@@ -13,10 +13,10 @@ data class TeacherData(
     val showStudentDialog: Boolean = false,
     val studentName : String = "",
     val studentRollNumber : String = "",
-    val isClassRoomEmpty : Boolean = true,
-    val isLoading : Boolean = false
+    val isClassRoomEmpty : Boolean = false, // IT should be true for testng purpose
+    val isLoading : Boolean = false,
+    val studentData : List<StudentData> = emptyList<StudentData>()
 ){
-
     companion object{
         enum class Section(val value: String) {
             A(value = "A"),
@@ -31,7 +31,14 @@ data class TeacherData(
                 "C",
             )
         }
+
     }
-
-
 }
+
+data class StudentData(
+    val studentName : String = "",
+    val studentRollNumber : Int = 0,
+    val classRoom : String = "",
+)
+
+

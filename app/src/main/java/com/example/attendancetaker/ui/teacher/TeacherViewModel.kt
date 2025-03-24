@@ -60,11 +60,26 @@ class TeacherViewModel @Inject constructor(
                     return@launch
                 }
                 val classRoomDetail = classRoomImpl.getClassRoom(teacherDetail.assignedClass)
-                
-                Timber.d("getInitialTeacherData: $classRoomDetail")
+
+                val studentDetails = studentImpl.getAllStudentDetailWithClassRoomId(teacherDetail.assignedClass)
+
+                if (studentDetails != null) {
+                    _state.update { state ->
+                        state.copy(
+                            studentData = studentDetails.map {
+                                StudentData(
+                                    studentName = it.studentName,
+                                    studentRollNumber = it.studentRollNumber,
+                                    classRoom = classRoomDetail?.className.toString() + " " + classRoomDetail?.classSection
+                                )
+                            }
+                        )
+                    }
+                }
 
                 _state.update {state ->
                     state.copy(
+                        assignedClassId = teacherDetail.assignedClass,
                         teacherName = teacherDetail.teacherName,
                         teacherEmail = teacherEmail,
                         classRoom = classRoomDetail?.className.toString() + " " + classRoomDetail?.classSection,
@@ -194,7 +209,7 @@ class TeacherViewModel @Inject constructor(
                 val student = Student(
                     studentId = UUID.randomUUID(),
                     studentName = state.value.studentName,
-                    studentRollNumber = state.value.studentRollNumber,
+                    studentRollNumber = state.value.studentRollNumber.toInt(),
                     classAssigned = state.value.assignedClassId
                 )
 

@@ -16,3 +16,9 @@ sealed class TeacherScreen{
     @Serializable
     data object Teacher : TeacherScreen()
 }
+
+@Serializable
+sealed class AttendanceScreen{
+    @Serializable
+    data object Attendance : AttendanceScreen()
+}
