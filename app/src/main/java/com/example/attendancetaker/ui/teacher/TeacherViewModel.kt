@@ -5,9 +5,12 @@ import androidx.lifecycle.viewModelScope
 import com.example.attendancetaker.MySharedPreferenceDataStore
 import com.example.attendancetaker.domain.teacher.model.Classroom
 import com.example.attendancetaker.domain.teacher.model.Student
+import com.example.attendancetaker.repository.AttendanceImpl
+import com.example.attendancetaker.repository.AuthenticationImpl
 import com.example.attendancetaker.repository.ClassRoomImpl
 import com.example.attendancetaker.repository.StudentImpl
 import com.example.attendancetaker.repository.TeacherImpl
+import com.example.attendancetaker.utils.AttendanceType
 import com.example.attendancetaker.utils.SnackBarController
 import com.example.attendancetaker.utils.SnackBarEvent
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -26,7 +29,9 @@ class TeacherViewModel @Inject constructor(
     private val classRoomImpl: ClassRoomImpl,
     private val teacherImpl : TeacherImpl,
     private val studentImpl : StudentImpl,
-    private val preferenceDataStore: MySharedPreferenceDataStore
+    private val attendanceImpl: AttendanceImpl,
+    private val preferenceDataStore: MySharedPreferenceDataStore,
+    private val authenticationImpl : AuthenticationImpl
 ) : ViewModel() {
 
 
@@ -39,7 +44,7 @@ class TeacherViewModel @Inject constructor(
         )
 
     init {
-//        getInitialTeacherData()
+        getInitialTeacherData()
     }
 
     private fun getInitialTeacherData() {
@@ -57,11 +62,20 @@ class TeacherViewModel @Inject constructor(
 
                 val teacherDetail = teacherImpl.getTeacherById(UUID.fromString(teacherId))
                 if (teacherDetail?.assignedClass == null) {
+                    _state.update { state ->
+                        state.copy(
+                            isLoading = false,
+                            isClassRoomEmpty = true
+                        )
+                    }
                     return@launch
                 }
+
                 val classRoomDetail = classRoomImpl.getClassRoom(teacherDetail.assignedClass)
 
                 val studentDetails = studentImpl.getAllStudentDetailWithClassRoomId(teacherDetail.assignedClass)
+
+                val getPast7DaysAttendance = attendanceImpl.getAttendancePast7Days(teacherDetail.assignedClass)
 
                 if (studentDetails != null) {
                     _state.update { state ->
@@ -70,7 +84,22 @@ class TeacherViewModel @Inject constructor(
                                 StudentData(
                                     studentName = it.studentName,
                                     studentRollNumber = it.studentRollNumber,
-                                    classRoom = classRoomDetail?.className.toString() + " " + classRoomDetail?.classSection
+                                    classRoom = classRoomDetail?.className.toString() + " " + classRoomDetail?.classSection,
+                                    studentId = it.studentId.toString(),
+                                    past7DaysAttendance = getPast7DaysAttendance.mapNotNull { attendanceDto ->
+                                        if (attendanceDto.studentId == it.studentId){
+                                            Last7DaysAttendance(
+                                                date = attendanceDto.attendanceDate ,
+                                                attendance = when(attendanceDto.attendanceType){
+                                                    AttendanceType.HOLIDAY -> AttendanceAndColor.HOLIDAY
+                                                    AttendanceType.ABSENT -> AttendanceAndColor.ABSENT
+                                                    AttendanceType.PRESENT -> AttendanceAndColor.PRESENT
+                                                },
+                                            )
+                                        }else{
+                                            null
+                                        }
+                                    }
                                 )
                             }
                         )
@@ -86,7 +115,8 @@ class TeacherViewModel @Inject constructor(
                         isClassRoomEmpty = false
                     )
                 }
-                Timber.d("getInitialTeacherData: ${state.value} + $classRoomDetail")
+
+
                 _state.update {state ->
                     state.copy(
                         isLoading = false
@@ -108,8 +138,11 @@ class TeacherViewModel @Inject constructor(
             is TeacherEvent.OnStudentRollNumberChange -> onStudentRollNumberChange(studentRollNumber = event.studentRollNumber)
             TeacherEvent.OnClassRoomSubmitChange -> onClassRoomSubmitChange()
             TeacherEvent.OnStudentSubmitChange -> onStudentSubmitChange()
+            TeacherEvent.OnSignOutButtonClick -> onSignOutButtonClick()
         }
     }
+
+
 
 
     private fun onStudentNameChange(studentName: String) {
@@ -195,6 +228,7 @@ class TeacherViewModel @Inject constructor(
                         message = "Successfully Created Class"
                     )
                 )
+                getInitialTeacherData()
             }
             catch (e : Exception){
                 Timber.e("onSubmitChange: ${e.message}")
@@ -210,7 +244,7 @@ class TeacherViewModel @Inject constructor(
                     studentId = UUID.randomUUID(),
                     studentName = state.value.studentName,
                     studentRollNumber = state.value.studentRollNumber.toInt(),
-                    classAssigned = state.value.assignedClassId
+                    classAssigned = state.value.assignedClassId!!
                 )
 
                 studentImpl.createStudent(student)
@@ -227,8 +261,26 @@ class TeacherViewModel @Inject constructor(
                         message = "Successfully Student Added"
                     )
                 )
+                getInitialTeacherData()
             }catch (e : Exception){
                 Timber.e("onStudentSubmitChange: ${e.message}")
+            }
+        }
+    }
+
+    private fun onSignOutButtonClick() {
+        viewModelScope.launch {
+            try {
+                preferenceDataStore.onClean()
+                if(authenticationImpl.signOut()){
+                    SnackBarController.sendEvent(
+                        event = SnackBarEvent(
+                            message = "Successfully Log Out"
+                        )
+                    )
+                }
+            }catch (e : Exception){
+                Timber.e("onSignOutButtonClick: ${e.message}")
             }
         }
     }

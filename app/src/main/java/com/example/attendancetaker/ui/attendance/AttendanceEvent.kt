@@ -6,5 +6,7 @@ sealed class AttendanceEvent {
 
     data class AssignedClassId(val assignedClassId : String) : AttendanceEvent()
 
+    data object OnHolidayButtonClick : AttendanceEvent()
+
     data object OnSubmitButtonClick : AttendanceEvent()
 }

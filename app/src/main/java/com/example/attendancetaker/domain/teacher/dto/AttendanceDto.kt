@@ -1,7 +1,6 @@
 package com.example.attendancetaker.domain.teacher.dto
 
 import com.example.attendancetaker.utils.AttendanceType
-import com.example.attendancetaker.utils.DateSerializer
 import com.example.attendancetaker.utils.UUIDSerializer
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
@@ -26,7 +25,7 @@ data class AttendanceDto(
     @Serializable(with = UUIDSerializer::class)
     val studentId : UUID,
 
-    @SerialName("attendance_data")
+    @SerialName("attendance_date")
     @Serializable(with = DateSerializer::class)
     val attendanceDate : Date = Date()
 

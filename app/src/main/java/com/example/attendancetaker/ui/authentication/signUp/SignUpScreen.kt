@@ -40,7 +40,6 @@ import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavController
-import androidx.navigation.NavHostController
 import com.example.attendancetaker.navigation.AuthScreen
 
 @Composable
@@ -54,7 +53,7 @@ fun SignUpScreen(
     val uiState by viewModel.state.collectAsStateWithLifecycle()
 
     LaunchedEffect(key1 = uiState.navigationApproval) {
-        if (uiState.navigationApproval) navController.navigate(AuthScreen.Signin)
+        if (uiState.navigationApproval) navController.navigate(AuthScreen.SigninNavigationRoute)
     }
 
     Column(
@@ -158,7 +157,7 @@ fun SignUpScreen(
                 Text(
                     modifier =  Modifier.
                         clickable {
-                            navController.navigate(route = AuthScreen.Signin)
+                            navController.navigate(route = AuthScreen.SigninNavigationRoute)
                         },
                     text = AnnotatedString("Login"),
                     style = TextStyle(
