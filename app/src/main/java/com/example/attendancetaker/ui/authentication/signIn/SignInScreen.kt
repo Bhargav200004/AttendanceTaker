@@ -39,7 +39,6 @@ import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavController
-import androidx.navigation.NavHostController
 import com.example.attendancetaker.navigation.AuthScreen
 import com.example.attendancetaker.navigation.TeacherScreen
 
@@ -52,7 +51,7 @@ fun SignInScreen(modifier: Modifier = Modifier , navController : NavController) 
 
 
     LaunchedEffect(key1 = uiState.navigationApproval) {
-        if (uiState.navigationApproval) navController.navigate(TeacherScreen.Teacher)
+        if (uiState.navigationApproval) navController.navigate(TeacherScreen.TeacherNavigationRoute)
     }
 
 
@@ -147,7 +146,7 @@ fun SignInScreen(modifier: Modifier = Modifier , navController : NavController) 
                     supportingText = "Not Have Account? ",
                     clickableText = "Sign Up",
                     onAnnotatedButtonClick = {
-                        navController.navigate(route = AuthScreen.Signup)
+                        navController.navigate(route = AuthScreen.SignupNavigationRoute)
                     }
                 )
 

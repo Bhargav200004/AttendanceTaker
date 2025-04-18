@@ -14,6 +14,8 @@ sealed class TeacherEvent  {
 
     data class OnStudentRollNumberChange(val studentRollNumber : String) : TeacherEvent()
 
+    data object OnSignOutButtonClick : TeacherEvent()
+
     data object OnStudentSubmitChange : TeacherEvent()
 
     data object OnClassRoomSubmitChange : TeacherEvent()

@@ -1,3 +1,4 @@
+import com.android.aaptcompiler.compileResource
 import java.util.Properties
 
 plugins {
@@ -19,7 +20,7 @@ android {
 
     defaultConfig {
         applicationId = "com.example.attendancetaker"
-        minSdk = 24
+        minSdk = 26
         targetSdk = 35
         versionCode = 1
         versionName = "1.0"
@@ -37,12 +38,16 @@ android {
             buildConfigField("String", "SUPABASE_ANON_KEY" , "\"${property.getProperty("SUPABASE_ANON_KEY")}\"")
             buildConfigField("String", "SECRET" , "\"${property.getProperty("SECRET")}\"")
             buildConfigField("String" , "SUPABASE_URL", "\"${property.getProperty("SUPABASE_URL")}\"")
+            buildConfigField("String" , "ATTENDANCE_NOTIFICATION_CHANNEL", "\"${property.getProperty("ATTENDANCE_NOTIFICATION_CHANNEL")}\"")
+            buildConfigField("String" , "ATTENDANCE_NOTIFICATION_NAME", "\"${property.getProperty("ATTENDANCE_NOTIFICATION_NAME")}\"")
         }
 
         debug {
             buildConfigField("String", "SUPABASE_ANON_KEY" , "\"${property.getProperty("SUPABASE_ANON_KEY")}\"")
             buildConfigField("String", "SECRET" , "\"${property.getProperty("SECRET")}\"")
             buildConfigField("String" , "SUPABASE_URL", "\"${property.getProperty("SUPABASE_URL")}\"")
+            buildConfigField("String" , "ATTENDANCE_NOTIFICATION_CHANNEL", "\"${property.getProperty("ATTENDANCE_NOTIFICATION_CHANNEL")}\"")
+            buildConfigField("String" , "ATTENDANCE_NOTIFICATION_NAME", "\"${property.getProperty("ATTENDANCE_NOTIFICATION_NAME")}\"")
         }
     }
     compileOptions {
@@ -122,5 +127,18 @@ dependencies {
 
 
     // Google Fonts
-    implementation("androidx.compose.ui:ui-text-google-fonts:1.7.8")
+    implementation(libs.androidx.ui.text.google.fonts)
+
+
+    // Work Manger + Kotlin Coroutine
+    implementation(libs.androidx.work.runtime.ktx)
+
+
+    // Custom Calendar
+    implementation(libs.compose)
+
+
+    // Permission
+    implementation(libs.accompanist.permissions)
+
 }

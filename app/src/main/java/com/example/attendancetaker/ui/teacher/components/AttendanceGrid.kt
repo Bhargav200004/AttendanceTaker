@@ -6,22 +6,27 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import com.example.attendancetaker.ui.teacher.Last7DaysAttendance
 
 @Composable
-fun AttendanceGrid() {
+fun AttendanceGrid(
+    past7DaysList: List<Last7DaysAttendance>
+) {
     Row(
         modifier = Modifier.fillMaxWidth(),
         horizontalArrangement = Arrangement.SpaceAround,
     ) {
 
-        val colorList = listOf<Color>(Color(210,104, 110) , Color.Gray , Color(255,255,197) , Color(146,210,147))
-        val attendance = listOf<String>("P" , "A" , "H" )
 
-        for (i in 1.. 7){
+        for (i in past7DaysList){
             AttendanceBox(
-                backGroundColor = colorList.random(),
-                content = attendance.random()
+                backGroundColor = i.attendance.color,
+                content = i.attendance.name.toString().firstChar()
             )
         }
     }
+}
+
+fun String.firstChar(): String {
+    return if (this.isNotEmpty()) this[0].toString() else ""
 }

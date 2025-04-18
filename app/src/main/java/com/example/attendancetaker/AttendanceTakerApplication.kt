@@ -1,7 +1,11 @@
 package com.example.attendancetaker
 
 import android.app.Application
-import android.util.Log
+import android.app.NotificationChannel
+import android.app.NotificationManager
+import android.content.ContentResolver
+import android.media.AudioAttributes
+import androidx.core.net.toUri
 import com.orhanobut.logger.AndroidLogAdapter
 import com.orhanobut.logger.FormatStrategy
 import com.orhanobut.logger.Logger
@@ -14,6 +18,26 @@ class AttendanceTakerApplication : Application() {
 
     override fun onCreate() {
         super.onCreate()
+
+        //Notification Channel for (8++ version )
+        val soundUri = "${ContentResolver.SCHEME_ANDROID_RESOURCE}://${packageName}/raw/notification_sound".toUri()
+
+        val notificationChannel = NotificationChannel(
+            BuildConfig.ATTENDANCE_NOTIFICATION_CHANNEL,
+            BuildConfig.ATTENDANCE_NOTIFICATION_NAME,
+            NotificationManager.IMPORTANCE_HIGH
+        ).apply {
+            setSound(
+                soundUri,
+                AudioAttributes.Builder()
+                    .setContentType(AudioAttributes.CONTENT_TYPE_SONIFICATION)
+                    .setUsage(AudioAttributes.USAGE_NOTIFICATION)
+                    .build()
+            )
+        }
+        val notificationManager = getSystemService(NOTIFICATION_SERVICE) as NotificationManager
+        notificationManager.createNotificationChannel(notificationChannel)
+
 
         // Custom Format Strategy for Logger
         val formatStrategy: FormatStrategy = PrettyFormatStrategy
