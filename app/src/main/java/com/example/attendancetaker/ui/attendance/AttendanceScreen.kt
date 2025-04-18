@@ -34,18 +34,19 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavController
 import com.example.attendancetaker.navigation.TeacherScreen
 import com.example.attendancetaker.utils.functions.DateConverter.toDateProvider
-import dagger.hilt.android.internal.lifecycle.HiltViewModelAssistedMap
-
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun AttendanceScreen(navController : NavController , assignedClassId : String) {
+fun AttendanceScreen(navController: NavController, assignedClassId: String) {
 
-    val viewModel : AttendanceViewModel = hiltViewModel<AttendanceViewModel , AttendanceViewModel.Factory>(
-        creationCallback = {factory ->
-            factory.create(classId = assignedClassId)
-        }
-    )
+    val viewModel: AttendanceViewModel =
+        hiltViewModel<AttendanceViewModel, AttendanceViewModel.Factory>(
+            creationCallback = { factory ->
+                factory.create(classId = assignedClassId)
+            }
+        )
+
+
 
     val uiState by viewModel.state.collectAsStateWithLifecycle()
 
@@ -54,20 +55,25 @@ fun AttendanceScreen(navController : NavController , assignedClassId : String) {
     }
 
     Scaffold(
-        topBar = {AttendanceScreenTopBar(
-            onBackButtonClick = {
-                navController.navigate(route = TeacherScreen.Teacher)
-            },
-            onDoneButtonClick = {
-                viewModel.onEvent(AttendanceEvent.OnSubmitButtonClick)
-            }
-        )}
-    ) {paddingValue ->
-        Column (
+        topBar = {
+            AttendanceScreenTopBar(
+                onBackButtonClick = {
+                    navController.navigate(route = TeacherScreen.TeacherNavigationRoute)
+                },
+                onHolidayButtonClick = {
+                    viewModel.onEvent(AttendanceEvent.OnHolidayButtonClick)
+                },
+                onDoneButtonClick = {
+                    viewModel.onEvent(AttendanceEvent.OnSubmitButtonClick)
+                }
+            )
+        }
+    ) { paddingValue ->
+        Column(
             modifier = Modifier
                 .fillMaxSize()
                 .padding(paddingValues = paddingValue)
-        ){
+        ) {
             HeaderInfoSection()
             LazyColumn {
 
@@ -77,8 +83,13 @@ fun AttendanceScreen(navController : NavController , assignedClassId : String) {
                         rollNumber = attendanceData.studentRollNumber,
                         studentName = attendanceData.studentName,
                         isPresent = attendanceData.isPresent,
-                        onRadioButtonClick = { studentId , isPresent ->
-                            viewModel.onEvent(AttendanceEvent.OnRadioButtonClick(studentId = studentId , isPresent = isPresent))
+                        onRadioButtonClick = { studentId, isPresent ->
+                            viewModel.onEvent(
+                                AttendanceEvent.OnRadioButtonClick(
+                                    studentId = studentId,
+                                    isPresent = isPresent
+                                )
+                            )
                         }
                     )
                 }
@@ -89,11 +100,11 @@ fun AttendanceScreen(navController : NavController , assignedClassId : String) {
 
 @Composable
 private fun AttendanceTackerContainer(
-    studentId : String,
-    rollNumber : Int,
-    studentName : String,
-    isPresent : Boolean,
-    onRadioButtonClick : (studentId : String , isPresent : Boolean) -> Unit
+    studentId: String,
+    rollNumber: Int,
+    studentName: String,
+    isPresent: Boolean,
+    onRadioButtonClick: (studentId: String, isPresent: Boolean) -> Unit
 ) {
     HorizontalDivider()
     Row(
@@ -121,7 +132,7 @@ private fun AttendanceTackerContainer(
                 .weight(0.8f),
             selected = isPresent,
             onClick = {
-                onRadioButtonClick(studentId , isPresent)
+                onRadioButtonClick(studentId, isPresent)
             }
         )
 
@@ -165,11 +176,21 @@ private fun HeaderInfoSection() {
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun AttendanceScreenTopBar(
-    onBackButtonClick : () -> Unit,
-    onDoneButtonClick : () -> Unit
+    onBackButtonClick: () -> Unit,
+    onHolidayButtonClick: () -> Unit,
+    onDoneButtonClick: () -> Unit
 ) {
     TopAppBar(
-        title = { Text("Attendance") },
+        title = {
+            Column {
+                Text("Attendance")
+                Text(
+                    text = toDateProvider(),
+                    style = MaterialTheme.typography.titleMedium
+                )
+            }
+
+        },
         navigationIcon = {
             IconButton(onClick = onBackButtonClick) {
                 Icon(
@@ -179,10 +200,13 @@ fun AttendanceScreenTopBar(
             }
         },
         actions = {
-            Text(
-                text = toDateProvider(),
-                style = MaterialTheme.typography.headlineSmall
-            )
+            Button(
+                modifier = Modifier.padding(start = 10.dp),
+                onClick = onHolidayButtonClick,
+                shape = RoundedCornerShape(10.dp)
+            ) {
+                Text(text = "On Holiday")
+            }
             Button(
                 modifier = Modifier.padding(start = 10.dp),
                 onClick = onDoneButtonClick,

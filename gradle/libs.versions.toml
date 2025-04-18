@@ -1,5 +1,7 @@
 [versions]
+accompanistPermissions = "0.37.2"
 agp = "8.8.2"
+compose = "2.6.2"
 kotlin = "2.1.10"
 coreKtx = "1.15.0"
 junit = "4.13.2"
@@ -7,7 +9,7 @@ junitVersion = "1.2.1"
 espressoCore = "3.6.1"
 lifecycleRuntimeKtx = "2.8.7"
 activityCompose = "1.10.1"
-composeBom = "2025.02.00"
+composeBom = "2025.03.01"
 kotlinxSerializationJson = "1.8.0"
 kspVersion = "2.1.10-1.0.31"
 hiltVersion = "2.55"
@@ -15,15 +17,21 @@ hiltCompiler = "1.2.0"
 hiltAndroidCompiler = "2.55"
 lifecycleViewmodelCompose = "2.8.7"
 logger = "2.2.0"
-navigationCompose = "2.8.8"
+navigationCompose = "2.8.9"
 ktor-version = "3.1.1"
 supabase_version = "3.1.1"
-datastorePreferences = "1.1.3"
+datastorePreferences = "1.1.4"
 timber = "5.0.1"
+uiTextGoogleFonts = "1.7.8"
+workRuntimeKtx = "2.10.0"
 
 [libraries]
+accompanist-permissions = { module = "com.google.accompanist:accompanist-permissions", version.ref = "accompanistPermissions" }
 androidx-core-ktx = { group = "androidx.core", name = "core-ktx", version.ref = "coreKtx" }
 androidx-lifecycle-viewmodel-ktx = { group = "androidx.lifecycle",name = "lifecycle-viewmodel-ktx", version.ref = "lifecycleRuntimeKtx" }
+androidx-ui-text-google-fonts = { module = "androidx.compose.ui:ui-text-google-fonts", version.ref = "uiTextGoogleFonts" }
+androidx-work-runtime-ktx = { module = "androidx.work:work-runtime-ktx", version.ref = "workRuntimeKtx" }
+compose = { module = "com.kizitonwose.calendar:compose", version.ref = "compose" }
 junit = { group = "junit", name = "junit", version.ref = "junit" }
 androidx-junit = { group = "androidx.test.ext", name = "junit", version.ref = "junitVersion" }
 androidx-espresso-core = { group = "androidx.test.espresso", name = "espresso-core", version.ref = "espressoCore" }
