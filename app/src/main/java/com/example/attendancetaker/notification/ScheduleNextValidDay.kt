@@ -1,7 +1,6 @@
 package com.example.attendancetaker.notification
 
 import android.content.Context
-import timber.log.Timber
 import java.time.LocalDate
 import java.time.LocalDateTime
 import java.time.LocalTime

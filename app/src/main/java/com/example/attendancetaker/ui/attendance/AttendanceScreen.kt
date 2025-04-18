@@ -34,8 +34,6 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavController
 import com.example.attendancetaker.navigation.TeacherScreen
 import com.example.attendancetaker.utils.functions.DateConverter.toDateProvider
-import timber.log.Timber
-
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable

@@ -5,10 +5,8 @@ import com.example.attendancetaker.domain.teacher.model.Attendance
 import com.example.attendancetaker.domain.teacher.repository.IAttendance
 import io.github.jan.supabase.postgrest.Postgrest
 import io.github.jan.supabase.postgrest.exception.PostgrestRestException
-import io.github.jan.supabase.postgrest.query.Columns
 import timber.log.Timber
 import java.time.LocalDate
-import java.time.ZoneId
 import java.time.format.DateTimeFormatter
 import java.util.UUID
 import javax.inject.Inject

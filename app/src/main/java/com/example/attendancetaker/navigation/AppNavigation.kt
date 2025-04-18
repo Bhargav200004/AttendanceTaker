@@ -16,7 +16,6 @@ import com.example.attendancetaker.ui.authentication.signIn.SignInScreen
 import com.example.attendancetaker.ui.authentication.signUp.SignUpScreen
 import com.example.attendancetaker.ui.student.StudentScreen
 import com.example.attendancetaker.ui.teacher.TeacherScreen
-import timber.log.Timber
 
 @Composable
 fun AppNavigation(modifier: Modifier = Modifier , context: Context ) {

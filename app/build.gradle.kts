@@ -1,4 +1,3 @@
-import com.android.aaptcompiler.compileResource
 import java.util.Properties
 
 plugins {
