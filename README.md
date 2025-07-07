@@ -41,8 +41,7 @@
 
 ## 📷 Demo Video
 
-
-> _📸 Add your actual screenshots to a `/screenshots` folder in your repo._
+https://github.com/user-attachments/assets/eb61c7b1-3bcd-414c-a7d8-d6ea07582408
 
 ---
 
