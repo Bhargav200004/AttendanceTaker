@@ -1,73 +1,82 @@
 # 📲 AttendanceTaker App
 
-AttendanceTaker is a modern Android application built to simplify attendance tracking for classrooms, meetings, or events. Designed with a clean UI and thoughtful features, it helps users manage and review attendance efficiently.
+**AttendanceTaker** is a modern Android app designed to simplify attendance tracking for classrooms, meetings, and events. It features secure cloud syncing, real-time notifications, and a beautiful UI built with Jetpack Compose.
 
 ---
 
 ## ✨ Features
 
-- **📚 Easy Subject Management**  
-  Create and manage subjects or classes for attendance tracking.
+- **📚 Subject & Class Management**  
+  Easily create and organize subjects or sessions.
 
-- **👥 Student/Participant Lists**  
-  Add and maintain participant lists for each subject.
+- **👥 Student/Participant List**  
+  Add and manage students or participants for each subject.
 
-- **✅ Intuitive Attendance Marking**  
-  Mark attendees as present, absent, or late using a simple interface.
+- **✅ Quick Attendance Marking**  
+  Mark students as **present**, **absent**, or **late** with one tap.
 
 - **📅 Calendar View**  
-  Visualize attendance records on a calendar to detect patterns and history.
+  Visualize attendance with a calendar to spot trends and gaps.
 
-- **📊 Attendance History & Reporting**  
-  View detailed attendance per student or subject. *(Report export coming soon)*
+- **📊 Attendance Reports** *(Planned)*  
+  Exportable reports to track individual and overall attendance.
 
-- **💾 Data Persistence**  
-  All data is saved locally on the device.
+- **🔔 Smart Notifications**  
+  Notifications using **Android Services** to remind users to mark attendance.
 
-- **🔔 Notifications & Reminders (Planned)**  
-  Set up reminders to take attendance or receive important alerts.
+- **🛡️ Supabase Authentication**  
+  Secure sign-in with **Supabase Auth** (email/password or third-party).
 
-- **🎨 Modern UI**  
-  Built using Jetpack Compose for a clean and responsive experience.
+- **☁️ Supabase Database**  
+  Attendance data is synced and stored securely in **Supabase Postgres**.
 
----
-
-## 🛠 Tech Stack & Architecture
-
-- **UI:** Jetpack Compose  
-- **Architecture:** MVVM + Repository Pattern  
-- **Persistence:**
-  - DataStore Preferences (Local)
-  - Supabase (PostgREST API for potential cloud sync)
-- **Async:** Kotlin Coroutines  
-- **Dependency Injection:** Hilt  
-- **Navigation:** Jetpack Navigation Compose  
-- **Calendar UI:** `com.kizitonwose.calendar:compose`  
-- **Permissions:** `com.google.accompanist:permissions`  
-- **Logging:** Timber  
-- **Serialization:** Kotlinx Serialization  
+- **🎨 Jetpack Compose UI**  
+  Smooth, modern UI using the latest Android design practices.
 
 ---
 
-## 📁 Key Components
+## 🧪 Test-Credentials
+- ``Email`` -> **_testteacher@gmail.com_**
+- ``Password`` -> **_test@100_**
 
-- **`MainActivity.kt`**  
-  App entry point. Handles permissions (like notifications & exact alarms) and sets global UI.
+## 📷 Demo Video
 
-- **`AppNavigation.kt`**  
-  Manages navigation graph and screen routing.
 
-- **`SnackBarController.kt`**  
-  Utility to show snackbars from any part of the app.
-
-- **`AttendanceTakerTheme.kt`**  
-  Defines the app’s visual theme, including colors and typography.
+> _📸 Add your actual screenshots to a `/screenshots` folder in your repo._
 
 ---
 
-## 🚀 Setup & Build Instructions
+## 🛠 Tech Stack
 
-1. **Clone the repository**
+| Layer           | Tech Used                                         |
+|----------------|---------------------------------------------------|
+| **UI**         | Jetpack Compose                                   |
+| **Architecture**| MVVM + Repository Pattern                        |
+| **Backend**    | Supabase (Auth + Postgres via PostgREST)          |
+| **Local Storage**| DataStore Preferences                          |
+| **Notifications**| Android Services / WorkManager (for reminders) |
+| **Async**      | Kotlin Coroutines                                 |
+| **DI**         | Hilt                                              |
+| **Navigation** | Jetpack Navigation Compose                        |
+| **Logging**    | Timber                                            |
+| **JSON**       | Kotlinx Serialization                             |
+
+---
+
+## 🗂️ Project Structure
+
+- `MainActivity.kt` — Main launcher, sets up UI and permissions.
+- `AppNavigation.kt` — App routes and screen navigation.
+- `SnackBarController.kt` — For global message handling.
+- `NotificationService.kt` — Service handling in-app reminders.
+- `SupabaseService.kt` — Logic for Auth & DB sync using Supabase.
+- `AttendanceTakerTheme.kt` — UI theming file.
+
+---
+
+## 🚀 Getting Started
+
+1. **Clone the repo**
    ```bash
    git clone https://github.com/your-username/AttendanceTaker.git
    cd AttendanceTaker
